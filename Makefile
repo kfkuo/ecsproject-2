@@ -12,7 +12,7 @@ LIB_DIR			= ./lib
 TESTSRC_DIR		= ./testsrc
 TESTOBJ_DIR		= ./testobj
 TESTBIN_DIR		= ./testbin
-TESTCOVER_DIR 	= ./htmlcov
+TESTCOVER_DIR 	= ./htmlconv
 
 # Define the flags
 DEFINES			= 
@@ -29,16 +29,18 @@ TEST_LDFLAGS	= $(LDFLAGS) -lgtest -lgtest_main -lpthread
 TEST_STR_OBJ_FILES	= $(TESTOBJ_DIR)/StringUtilsTest.o $(TESTOBJ_DIR)/StringUtils.o
 TEST_STRSRC_OBJ_FILES = $(TESTOBJ_DIR)/StringDataSource.o $(TESTOBJ_DIR)/StringDataSourceTest.o
 TEST_STRSINK_OBJ_FILES = $(TESTOBJ_DIR)/StringDataSink.o $(TESTOBJ_DIR)/StringDataSinkTest.o
-TEST_DSV_OBJ_FILES = $(TESTOBJ_DIR)/StringDataSink.o $(TESTOBJ_DIR)/DSVWriter.o $(TESTOBJ_DIR)/DSVTest.o
+TEST_DSV_OBJ_FILES = $(TESTOBJ_DIR)/StringDataSink.o $(TESTOBJ_DIR)/DSVWriter.o $(TESTOBJ_DIR)/DSVReader.o $(TESTOBJ_DIR)/DSVTest.o
+TEST_XML_OBJ_FILES = $(TESTOBJ_DIR)/XMLEntity.o $(TESTOBJ_DIR)/XMLReader.o $(TESTOBJ_DIR)/XMLWriter.o $(TESTOBJ_DIR)/XMLTest.o
 
 # Define the test target
 TEST_STR_TARGET	= $(TESTBIN_DIR)/teststrutils
 TEST_STRSRC_TARGET	= $(TESTBIN_DIR)/teststrdatasource 
 TEST_STRSINK_TARGET	= $(TESTBIN_DIR)/teststrdatasink
 TEST_DSV_TARGET = $(TESTBIN_DIR)/testdsv
+TEST_XML_TARGET = $(TESTBIN_DIR)/testxml
 
 
-all: directories run_strtest run_strsrctest run_strsinktest run_dsvtest gencoverage
+all: directories run_strtest run_strsrctest run_strsinktest run_dsvtest run_xmltest gencoverage
 
 run_strtest: $(TEST_STR_TARGET)
 	$(TEST_STR_TARGET)
@@ -51,6 +53,9 @@ run_strsinktest: $(TEST_STRSINK_TARGET)
 
 run_dsvtest: $(TEST_DSV_TARGET)
 	$(TEST_DSV_TARGET)
+
+run_xmltest: $(TEST_XML_TARGET)
+	$(TEST_XML_TARGET)
 
 
 gencoverage:
@@ -69,6 +74,9 @@ $(TEST_STRSINK_TARGET): $(TEST_STRSINK_OBJ_FILES)
 
 $(TEST_DSV_TARGET): $(TEST_DSV_OBJ_FILES)
 	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_DSV_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_DSV_TARGET)
+
+$(TEST_XML_TARGET): $(TEST_XML_OBJ_FILES)
+	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_XML_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_XML_TARGET)
 
 
 $(TESTOBJ_DIR)/%.o: $(TESTSRC_DIR)/%.cpp
