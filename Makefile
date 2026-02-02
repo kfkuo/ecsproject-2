@@ -94,7 +94,7 @@ directories:
 	mkdir -p $(TESTOBJ_DIR)
 	mkdir -p $(TESTCOVER_DIR)
 
-clean::
+clean:
 	rm -rf $(BIN_DIR)
 	rm -rf $(OBJ_DIR)
 	rm -rf $(LIB_DIR)
