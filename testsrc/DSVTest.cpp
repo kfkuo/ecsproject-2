@@ -24,3 +24,21 @@ TEST(DSVWriterTest, SingleRowTest){
     EXPECT_EQ(DataSink->String(),"A,B,C");
 
 }
+
+// checks that more than one row is written correctly
+TEST(DSVWriterTest, MultipleRowsTest){
+    std::shared_ptr<CStringDataSink> DataSink = std::make_shared<CStringDataSink>();
+    CDSVWriter Writer(DataSink,',');
+
+    EXPECT_TRUE(Writer.WriteRow({"A","B","C"}));
+    EXPECT_TRUE(Writer.WriteRow({"1","2","3"}));
+    EXPECT_EQ(DataSink->String(),"A,B,C\n1,2,3");
+}
+
+TEST(DSVWriterTest, LeadingTrailingSpace){
+    std::shared_ptr<CStringDataSink> DataSink = std::make_shared<CStringDataSink>();
+    CDSVWriter Writer(DataSink,',');
+
+    EXPECT_TRUE(Writer.WriteRow({"   A", "B   ", "   C   "}));
+    EXPECT_EQ(DataSink->String(), "   A,B   ,   C   \n");
+}
