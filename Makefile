@@ -30,7 +30,7 @@ TEST_STR_OBJ_FILES	= $(TESTOBJ_DIR)/StringUtilsTest.o $(TESTOBJ_DIR)/StringUtils
 TEST_STRSRC_OBJ_FILES = $(TESTOBJ_DIR)/StringDataSource.o $(TESTOBJ_DIR)/StringDataSourceTest.o
 TEST_STRSINK_OBJ_FILES = $(TESTOBJ_DIR)/StringDataSink.o $(TESTOBJ_DIR)/StringDataSinkTest.o
 TEST_DSV_OBJ_FILES = $(TESTOBJ_DIR)/StringDataSink.o $(TESTOBJ_DIR)/DSVWriter.o $(TESTOBJ_DIR)/DSVReader.o $(TESTOBJ_DIR)/DSVTest.o
-TEST_XML_OBJ_FILES = $(TESTOBJ_DIR)/StringDataSource.o $(TESTOBJ_DIR)/XMLReader.o $(TESTOBJ_DIR)/XMLWriter.o $(TESTOBJ_DIR)/XMLTest.o
+TEST_XML_OBJ_FILES = TEST_XML_OBJ_FILES = $(TESTOBJ_DIR)/StringUtils.o $(TESTOBJ_DIR)/StringDataSource.o $(TESTOBJ_DIR)/StringDataSink.o $(TESTOBJ_DIR)/XMLReader.o $(TESTOBJ_DIR)/XMLWriter.o $(TESTOBJ_DIR)/XMLTest.o
 
 # Define the test target
 TEST_STR_TARGET	= $(TESTBIN_DIR)/teststrutils
