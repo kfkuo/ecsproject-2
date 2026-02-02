@@ -1,160 +1,328 @@
 #include "StringUtils.h"
-#include <cctype>
-#include <algorithm>
-#include <sstream>
-#include <vector>
-#include <string>
 
-namespace StringUtils {
+namespace StringUtils{
 
-std::string Slice(const std::string &str, ssize_t start, ssize_t end) noexcept {
-    ssize_t len = str.size();
-    if (start < 0) start += len;
-    if (end <= 0) end += len;
-    if (start < 0) start = 0;
-    if (end > len) end = len;
-    if (start >= end) return "";
-    return str.substr(start, end - start);
-}
+std::string Slice(const std::string &str, ssize_t start, ssize_t end) noexcept{
+    std::string Temp = str;
+    int tmpStart = start;
+    int tmpEnd = end;
+    size_t Length = Temp.length();
 
-std::string Capitalize(const std::string &str) noexcept {
-    if (str.empty()) return "";
-    std::string result = str;
-    result[0] = std::toupper(result[0]);
-    std::transform(result.begin() + 1, result.end(), result.begin() + 1, ::tolower);
-    return result;
-}
-
-std::string Upper(const std::string &str) noexcept {
-    std::string result = str;
-    std::transform(result.begin(), result.end(), result.begin(), ::toupper);
-    return result;
-}
-
-std::string Lower(const std::string &str) noexcept {
-    std::string result = str;
-    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
-    return result;
-}
-
-std::string LStrip(const std::string &str) noexcept {
-    size_t start = str.find_first_not_of(" \t\n\r\f\v");
-    if (start == std::string::npos) return "";
-    return str.substr(start);
-}
-
-std::string RStrip(const std::string &str) noexcept {
-    size_t end = str.find_last_not_of(" \t\n\r\f\v");
-    if (end == std::string::npos) return "";
-    return str.substr(0, end + 1);
-}
-
-std::string Strip(const std::string &str) noexcept {
-    return LStrip(RStrip(str));
-}
-
-std::string Center(const std::string &str, int width, char fill) noexcept {
-    int diff = width - str.size();
-
-    if (diff <= 0) {
-        return str;
+    if (tmpStart < 0){ // return empty string if negative start passed
+        return "";
+    }
+    if (tmpEnd < 0){ // turn end positive if negative
+        tmpEnd = Length + tmpEnd;
     }
 
-    if (diff == 1) {
-        return str + fill;
-    }
-
-    // diff >= 2
-    return std::string(1, fill) + str + std::string(1, fill);
+    return Temp.substr(tmpStart, tmpEnd - tmpStart);
 }
 
-std::string LJust(const std::string &str, int width, char fill) noexcept {
-    int pad = width - str.size() - 1;
-    if (pad <= 0) return str;
-    return str + std::string(pad, fill);
-}
+std::string Capitalize(const std::string &str) noexcept{
+    std::string Temp = str;
 
-std::string RJust(const std::string &str, int width, char fill) noexcept {
-    int pad = width - str.size() - 1;
-    if (pad <= 0) return str;
-    return std::string(pad, fill) + str;
-}
-
-std::string Replace(const std::string &str, const std::string &old, const std::string &rep) noexcept {
-    std::string result = str;
-    size_t pos = 0;
-    while ((pos = result.find(old, pos)) != std::string::npos) {
-        result.replace(pos, old.length(), rep);
-        pos += rep.length();
-    }
-    return result;
-}
-
-std::vector<std::string> Split(const std::string &str, const std::string &splt) noexcept {
-    std::vector<std::string> result;
-    if (splt.empty()) {
-        std::istringstream iss(str);
-        std::string token;
-        while (iss >> token) result.push_back(token);
-    } else {
-        size_t start = 0, end;
-        while ((end = str.find(splt, start)) != std::string::npos) {
-            result.push_back(str.substr(start, end - start));
-            start = end + splt.size();
-        }
-        result.push_back(str.substr(start));
-    }
-    return result;
-}
-
-std::string Join(const std::string &sep, const std::vector<std::string> &vect) noexcept {
-    std::string result;
-    for (size_t i = 0; i < vect.size(); ++i) {
-        result += vect[i];
-        if (i != vect.size() - 1) result += sep;
-    }
-    return result;
-}
-
-std::string ExpandTabs(const std::string &str, int tabsize) noexcept {
-    std::string result;
-    bool at_line_start = true;
-
-    for (char c : str) {
-        if (c == '\t') {
-            result.append(at_line_start ? tabsize : tabsize - 1, ' ');
-            at_line_start = false;
-        } else {
-            result.push_back(c);
-            at_line_start = (c == '\n');
+    if(!Temp.empty()){
+        Temp[0] = toupper(Temp[0]); // uppercase first letter
+        for(size_t i = 1; i < Temp.length(); i++){
+            Temp[i] = tolower(Temp[i]); // lowercase all other letters
         }
     }
-    return result;
+    return Temp;
 }
 
-int EditDistance(const std::string &left, const std::string &right, bool ignorecase) {
-    std::string s1 = left;
-    std::string s2 = right;
+std::string Upper(const std::string &str) noexcept{
+    std::string Temp = str;
 
-    if (ignorecase) {
-        for (size_t i = 0; i < s1.size(); ++i) s1[i] = std::tolower(s1[i]);
-        for (size_t i = 0; i < s2.size(); ++i) s2[i] = std::tolower(s2[i]);
+    if(!Temp.empty()){
+        for(size_t i = 0; i < Temp.length(); i++){
+            Temp[i] = toupper(Temp[i]); // uppercase all letters
+        }
     }
 
-    int m = s1.size();
-    int n = s2.size();
-
-    if (m == 0) return n;
-    if (n == 0) return m;
-
-    if (s1[m - 1] == s2[n - 1])
-        return EditDistance(s1.substr(0, m - 1), s2.substr(0, n - 1), false);
-
-    int insertOp = EditDistance(s1, s2.substr(0, n - 1), false);
-    int deleteOp = EditDistance(s1.substr(0, m - 1), s2, false);
-    int replaceOp = EditDistance(s1.substr(0, m - 1), s2.substr(0, n - 1), false);
-
-    return 1 + std::min(insertOp, std::min(deleteOp, replaceOp));
+    return Temp;
 }
 
+std::string Lower(const std::string &str) noexcept{
+    std::string Temp = str;
+
+    if(!Temp.empty()){
+        for(size_t i = 0; i < Temp.length(); i++){
+            Temp[i] = tolower(Temp[i]); // lowercase all letters
+        }
+    }
+
+    return Temp;
 }
+
+std::string LStrip(const std::string &str) noexcept{
+    std::string Temp = str;
+    size_t i = 0;
+    size_t Length = Temp.length();
+
+    // find first nonspace character
+    while(i < Length && isspace(Temp[i])){
+        i++;
+    }
+
+    // return everything but left space characters
+    return Temp.substr(i);
+}
+
+std::string RStrip(const std::string &str) noexcept{
+    std::string Temp = str;
+    int Length = Temp.length();
+    int i = Length - 1;
+
+    // find first nonspace characters from end
+    while(i >= 0 && isspace(Temp[i])){
+        i--;
+    }
+
+    // return everything but right space characters
+    return Temp.substr(0, i+1);
+}
+
+std::string Strip(const std::string &str) noexcept{
+    std::string Temp = str;
+    return LStrip(RStrip(Temp)); // strip left then strip right
+}
+
+std::string Center(const std::string &str, int width, char fill) noexcept{
+    
+    int Length = str.length();
+    int LeftWidth = (width - Length) / 2; // find desired left spacing
+
+    // right then left justify
+    return LJust(RJust(str, Length + LeftWidth, fill), width, fill); 
+}
+
+std::string LJust(const std::string &str, int width, char fill) noexcept{
+
+    std::string Temp = str;
+    int Length = Temp.length();
+
+    if (width <= Length){ // return string if width < its actual length
+        return Temp;
+    }
+
+    for (int i = Length + 1; i <= width; i++){ // add fill chars to right
+        Temp += fill;
+    }
+
+    return Temp;
+}
+
+std::string RJust(const std::string &str, int width, char fill) noexcept{
+    std::string Result = "";
+    std::string Temp = str;
+    int Length = Temp.length();
+    int LeftWidth = width - Length;
+
+
+    if (width < Length){ // return string if width is < its actual length
+        return Temp;
+    }
+
+    for (int i = 0; i < LeftWidth; i++){ // add fill chars to empty string
+        Result += fill;
+    }
+
+    Result += Temp; // add string to fill chars
+
+
+    return Result;
+}
+
+std::string Replace(const std::string &str, const std::string &old, const std::string &rep) noexcept{
+    std::string Result = "";
+    int Length = str.length();
+    int OldLength = old.length();
+
+    int i = 0;
+
+    
+    while(i < Length){
+        // if old found, add replacement
+        if (str.substr(i, OldLength) == old){
+            Result += rep;
+            i += OldLength;
+        }
+
+        // otherwise add the next letter of the original string
+        else{
+            Result += str[i];
+            i++;
+        }
+        
+    }
+
+    return Result;
+}
+
+std::vector< std::string > Split(const std::string &str, const std::string &splt) noexcept{
+    std::vector<std::string> Result;
+    std::string Temp = str;
+    std::string SubTemp;
+    
+    int Length = Temp.length();
+    int SpltLength = splt.length();
+    int Start = 0;
+    int i = 0;
+
+    // when splt is "" split at whitespace 
+    if(splt == ""){
+        while(i <= Length){
+            // find whitespaces
+            if (isspace(Temp[i])){
+
+                // add characters between whitespaces/ends to vector
+                Result.push_back(Temp.substr(Start, i-Start)); 
+                i++;
+                Start = i;
+
+            }
+            else{
+                i++; 
+            }
+        }
+        
+    }
+
+    // when splt is non-whitespace
+    else{
+        while(i < Length-SpltLength){
+            // find instances of splt
+            if ((Temp.substr(i, SpltLength) == splt)){
+
+                // add characters between splts/ends to vector
+                Result.push_back(Temp.substr(Start, i-Start));
+                i += SpltLength;
+                Start = i;
+            }
+            else{
+                i++;
+            }
+        }
+    }
+
+    // add last split to vector
+    Result.push_back(Temp.substr(Start, Length-Start));
+
+    return Result;
+}
+
+std::string Join(const std::string &str, const std::vector< std::string > &vect) noexcept{
+    int inputSize = vect.size();
+    std::string Result = "";
+
+    // add each word in vector to empty string with separator after
+    for (int i = 0; i < inputSize - 1; i++){
+        Result += vect[i];
+        Result += str;
+    }
+
+    // add last word without separator
+    Result += vect[inputSize-1];
+
+    return Result;
+}
+
+std::string ExpandTabs(const std::string &str, int tabsize) noexcept{
+    std::string Result = "";
+    int Length = str.length();
+    int i = 0;
+    int TabIndex;
+
+    while (i < Length){
+
+        // find tabs
+        if (str[i] == '\t'){
+
+            // find how many spaces needed until next tab stop
+            TabIndex = (i + 1) % tabsize;
+
+            // add spaces
+            if (TabIndex!= 0){
+                for (int j = 0; j <= (tabsize - TabIndex); j++){
+                    Result += " ";
+                }
+
+            }
+            else{
+                for (int k = 0; k < tabsize; k++){
+                    Result += " ";
+                }
+            }
+        }
+
+        // add next character in string
+        else{
+            Result += str[i];
+        }
+
+        i++;
+    }
+
+    return Result;
+}
+
+int EditDistance(const std::string &left, const std::string &right, bool ignorecase) noexcept{
+    std::string tmpLeft;
+    std::string tmpRight;
+
+    int Min;
+    int Lev1;
+    int Lev2;
+    int Lev3;
+
+    // lowercase both string parameters
+    if (ignorecase){
+        tmpLeft = Lower(left);
+        tmpRight = Lower(right);
+    }
+    else{
+        tmpLeft = left; // a
+        tmpRight = right; // b
+    }
+
+    // base case 1
+    if (tmpLeft.length() == 0){
+        return tmpRight.length();
+    }
+
+    // base case 2
+    else if(tmpRight.length() == 0){
+        return tmpLeft.length();
+    }
+
+    // find levenshtein distance of tail(a) and tail(b) if first letter of a and b 
+    // is the same
+    else if(tmpLeft[0] == tmpRight[0]){
+        return EditDistance(tmpLeft.substr(1, tmpLeft.length() - 1), tmpRight.substr(1, tmpRight.length() - 1));
+    }
+
+    else {
+        // find the minimum levenshtein distance of tail(a) and b,
+        // a and tail(b)), tail(a) and tail(b))
+        Lev1 = EditDistance(tmpLeft.substr(1, tmpLeft.length() - 1), tmpRight);
+        Lev2 = EditDistance(tmpLeft, tmpRight.substr(1, tmpRight.length() - 1));
+        Lev3 = EditDistance(tmpLeft.substr(1, tmpLeft.length() - 1), tmpRight.substr(1, tmpRight.length() - 1));
+
+        Min = Lev1;
+
+        if (Lev2 < Min){
+            Min = Lev2;
+        }
+
+        else if (Lev3 < Min){
+            Min = Lev3;
+        }
+
+        // add 1 to the minimum
+        return 1 + Min;
+    }
+
+    return 0;
+}
+
+};
