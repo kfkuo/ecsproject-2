@@ -1,6 +1,6 @@
 # Project X README
 
-Student 1: Partner1 Name (123456789)
+Student 1: Katelyn Kuo (923189082)
 
 Student 2: Emilia Moore (922041095)
 
