@@ -2,7 +2,7 @@
 
 Student 1: Partner1 Name (123456789)
 
-Student 2: Partner2 Name (123456987)
+Student 2: Emilia Moore (922041095)
 
 ## Project Status
 This the current status of the project ...
@@ -11,8 +11,7 @@ This the current status of the project ...
 The project fails to function properly in ...
 
 ## Code References
-* [Different ways to initialize variables](https://stackoverflow.com/questions/22543875/different-ways-to-initialize-variables)
-* [Some other link](https://stackoverflow.com)
+* [How to use a stack in C++](https://www.geeksforgeeks.org/cpp/stack-in-cpp-stl/)
 
 ## Generative AI Use
 I used ChatGPT for Prompt 1, and ZZZZZ for Prompt 2....
