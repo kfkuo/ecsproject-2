@@ -3,7 +3,7 @@
 
 #include <memory>
 #include "XMLEntity.h"
-#include "DataSink.h"
+#include "StringDataSink.h"
 
 class CXMLWriter{
     private:
