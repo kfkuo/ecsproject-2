@@ -17,14 +17,45 @@ struct CDSVWriter::SImplementation{
 
     bool WriteRow(const std::vector<std::string> &row){
         bool First = true;
+
         for(auto &Column : row){
-            std::vector<char> Buffer(Column.begin(),Column.end());
+
             if(!First){
                 DSink->Put(DDelimiter);
             }
             First = false;
-            DSink->Write(Buffer);
+
+            bool NeedsQuotes = DQuoteAll;
+
+            if(!NeedsQuotes){
+                for(int i = 0; i < Column.size(); i++){
+                    char c = Column[i];
+                    if(c == DDelimiter || c == '"' || c == '\n'){
+                        NeedsQuotes = true;
+                        break;
+                    }
+                }
+            }
+
+            if(NeedsQuotes){
+                DSink->Put('"');
+
+                for(int i = 0; i < Column.size(); i++){
+                    char c = Column[i];
+                    if (c == '"'){
+                        DSink->Put('"');
+                    }
+                    DSink->Put(c);
+                }
+                DSink->Put('"');
+            }
+            
+            else{
+                std::vector<char> Buffer(Column.begin(),Column.end());
+                DSink->Write(Buffer);
+            }
         }
+        DSink->Put('\n');
         return true;
     }
 
