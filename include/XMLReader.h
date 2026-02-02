@@ -3,7 +3,7 @@
 
 #include <memory>
 #include "XMLEntity.h"
-#include "DataSource.h"
+#include "StringDataSource.h"
 
 class CXMLReader{
     private:
