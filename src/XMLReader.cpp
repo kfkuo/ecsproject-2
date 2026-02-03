@@ -7,6 +7,8 @@ struct CXMLReader::SImplementation{
     std::shared_ptr< CDataSource > DSource; // pointer to data source
     XML_Parser DParser;
     std::deque<SXMLEntity> DDeque; //queue of XML entities
+    int BytesRead = 0;
+    bool Finished = false;
 
     // creates new start entity, sets its DType, name, and attributes, puts in queue
     static void StartElementHandler(void *userData, const XML_Char *name, const XML_Char **atts){
@@ -54,33 +56,36 @@ struct CXMLReader::SImplementation{
 
     // returns true if all entities have been read from xml
     bool End() const{
-        return true;
+        if (Finished){
+            return true;
+        }
+        return false;
     }
 
     
     bool ReadEntity(SXMLEntity &entity, bool skipcdata){
+        if ((BytesRead >= DSource->End()) && DDeque.empty()){
+            Finished = true;
+        }
+
         // if queue is empty, read 512 characters of the source and feed it to the parser
         if(DDeque.empty()){
             std::vector<char> Buffer(512);
             DSource->Read(Buffer,Buffer.size());
+            // BytesRead += 512;
             XML_Parse(DParser,Buffer.data(),Buffer.size(),DSource->End());
 
-            // take entity out of queue if char data is read
-            SXMLEntity Read = DDeque.back();
-            if(skipcdata && !DDeque.empty() && (DDeque.back().DType == SXMLEntity::EType::CharData)){
-                DDeque.pop_back();
-            }
         }
         
         // if queue has entities in it, pop entity off and set entity to that item
         if(!DDeque.empty()){
+            if(skipcdata && (DDeque.front().DType == SXMLEntity::EType::CharData)){
+                DDeque.pop_front();
+            }
+
             entity = DDeque.front();
             DDeque.pop_front();
             return true;
-        }
-
-        if(DDeque.empty()){
-            
         }
 
         return false;
