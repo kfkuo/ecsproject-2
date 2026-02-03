@@ -162,11 +162,11 @@ TEST(XMLWriter, EscapeTest){
     TempEntity.DNameData = "tag";
     Writer.WriteEntity(TempEntity);
     const std::string Output = DataSink->String();
-    EXPECT_EQ(Output, "<tag>&lt&gt&amp&quot&apos</tag>");
+    EXPECT_EQ(Output, "<tag>&lt;&gt;&amp;&quot;&apos;</tag>");
 }
 
 TEST(XMLReader, EscapeTest){
-    std::string XMLString = "<tag>&lt&gt&amp&quot&apos</tag>";
+    std::string XMLString = "<tag>&lt;&gt;&amp;&quot;&apos;</tag>";
     std::shared_ptr<CStringDataSource> DataSource = std::make_shared<CStringDataSource>(XMLString);
     CXMLReader Reader(DataSource);
     SXMLEntity TempEntity;
@@ -257,11 +257,11 @@ TEST(XMLWriter, CompleteElementTest){
     TempEntity.SetAttribute("species", "monarch");
     Writer.WriteEntity(TempEntity);
     const std::string Output = DataSink->String();
-    EXPECT_EQ(Output, "<butterfly/ species=\"monarch\">");
+    EXPECT_EQ(Output, "<butterfly species=\"monarch\"/>");
 }
 
 TEST(XMLReader, CompleteElementTest){
-    std::string XMLString = "<butterfly/ species=\"monarch\">";
+    std::string XMLString = "<butterfly species=\"monarch\"/>";
     std::shared_ptr<CStringDataSource> DataSource = std::make_shared<CStringDataSource>(XMLString);
     CXMLReader Reader(DataSource);
     SXMLEntity TempEntity;
