@@ -15,72 +15,109 @@ struct CXMLWriter::SImplementation{
 
     };
 
-    
-
-    bool Flush(){
-        // if(!DStack.empty()){
-        //     while (!DStack.empty()){
-        //         WriteEntity(DStack.top());
-        //         DStack.pop();
-        //     }
-        // }  
-
-        return false;
-    };
 
     void EscapeHelper(std::string &charString){
-        //REPLACE RETURNS THE STRING
-        std::string temp = charString.substr(1,charString.size() - 1);
-        StringUtils::Replace(temp, "<", "&lt");
-        StringUtils::Replace(temp, ">", "&gt");
-        StringUtils::Replace(temp, "&", "&amp");
-        StringUtils::Replace(temp, "\"", "&quot");
-        StringUtils::Replace(temp, "'", "&apos");
-        StringUtils::Replace(charString, charString.substr(1,charString.size() + 1), temp);
+        std::string temp = charString;
+        temp = StringUtils::Replace(temp, "&", "&amp;");
+        temp = StringUtils::Replace(temp, "<", "&lt;");
+        temp = StringUtils::Replace(temp, ">", "&gt;");
+        temp = StringUtils::Replace(temp, "\"", "&quot;");
+        temp = StringUtils::Replace(temp, "'", "&apos;");
+        charString = temp;
+
     };
 
-    void AttributesHelper(){
-        
+    void AttributesHelper(const SXMLEntity &entity, std::string &sentity){
+
+        std::string data = entity.DNameData;
+        EscapeHelper(data);
+        sentity += data;
+
+        if (!entity.DAttributes.empty()){
+            for(auto &Attribute : entity.DAttributes){
+                std::string name = std::get<0>(Attribute);
+                std::string val = std::get<1>(Attribute);
+                EscapeHelper(val);
+                sentity += " ";
+                sentity += name;
+                sentity += "=\"";
+                sentity += val;
+                sentity += "\"";
+            }
+        }
     }
 
-    bool WriteEntity(const SXMLEntity &entity){
-        std::string sentity = "<";
+    void BracketHelper(std::string &sentity){
+        std::string temp = "<";
+        temp += sentity;
+        temp += ">";
+        sentity = temp;
+    }
+
+    bool Write(const SXMLEntity &entity){
+        std::string sentity = "";
         std::vector <std::string> tempVector;
-        sentity += entity.DNameData;
+        std::string temp = "";
+        
         if (entity.DType == SXMLEntity::EType::StartElement){
-            if (!entity.DAttributes.empty()){
-                for(auto &Attribute : entity.DAttributes){
-                    sentity += " ";
-                    sentity += std::get<0>(Attribute);
-                    sentity += "=";
-                    sentity += std::get<1>(Attribute); 
-                }
-                sentity += ">";
-            }
-            
+            AttributesHelper(entity, sentity);
+            BracketHelper(sentity);
         }
-        else if (entity.DType == SXMLEntity::EType::CharData){
-            
-        }
+
         else if (entity.DType == SXMLEntity::EType::EndElement){
-            
+            sentity += "/";
+            sentity += entity.DNameData;
+            EscapeHelper(sentity);
+            BracketHelper(sentity);
         }
+
+        else if (entity.DType == SXMLEntity::EType::CharData){
+            sentity += entity.DNameData;
+            EscapeHelper(sentity);
+        }
+
         else if (entity.DType == SXMLEntity::EType::CompleteElement){
-            
+            AttributesHelper(entity, sentity);
+            sentity += "/";
+            BracketHelper(sentity);
         }
 
-        //EscapeHelper(sentity);
-
-        // write entity to sink
-        for(int i = 0; sentity[i]; i++){
-            DSink->Put(sentity[i]);
+        // write entity to sink 
+        for(char c : sentity){
+            if(!DSink->Put(c)){
+                return false;
+            };
         }
+        return true;
+    }
 
-        DStack.push(entity);
-        
+    bool Flush(){
+        // write all entities on stack to data sink
+        if(!DStack.empty()){
+            while (!DStack.empty()){
+                Write(DStack.top());
+                DStack.pop();
+            }
+        }  
 
-        
         return false;
+    };
+
+    bool WriteEntity(const SXMLEntity &entity){
+        SXMLEntity tempEntity;
+        //write entity to sink
+        if(!Write(entity)){
+            return false;
+        }
+
+        // if start element, put end element entity on stack
+        if (entity.DType == SXMLEntity::EType::StartElement){
+            tempEntity.DNameData = entity.DNameData;
+            tempEntity.DType = SXMLEntity::EType::EndElement;
+            DStack.push(tempEntity);
+        }
+        
+        return true;
     };
 };
 
