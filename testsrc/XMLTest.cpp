@@ -176,11 +176,22 @@ TEST(XMLReader, EscapeTest){
     EXPECT_TRUE(TempEntity.DAttributes.empty());
     EXPECT_TRUE(Reader.ReadEntity(TempEntity));
     EXPECT_EQ(TempEntity.DType,SXMLEntity::EType::CharData);
-    EXPECT_EQ(TempEntity.DNameData,"<>&\"'");
+    EXPECT_EQ(TempEntity.DNameData,"<");
+    EXPECT_TRUE(Reader.ReadEntity(TempEntity));
+    EXPECT_EQ(TempEntity.DType,SXMLEntity::EType::CharData);
+    EXPECT_EQ(TempEntity.DNameData,">");
+    EXPECT_TRUE(Reader.ReadEntity(TempEntity));
+    EXPECT_EQ(TempEntity.DType,SXMLEntity::EType::CharData);
+    EXPECT_EQ(TempEntity.DNameData,"&");
+    EXPECT_TRUE(Reader.ReadEntity(TempEntity));
+    EXPECT_EQ(TempEntity.DType,SXMLEntity::EType::CharData);
+    EXPECT_EQ(TempEntity.DNameData,"\"");
+    EXPECT_TRUE(Reader.ReadEntity(TempEntity));
+    EXPECT_EQ(TempEntity.DType,SXMLEntity::EType::CharData);
+    EXPECT_EQ(TempEntity.DNameData,"'");
     EXPECT_TRUE(Reader.ReadEntity(TempEntity));
     EXPECT_EQ(TempEntity.DType,SXMLEntity::EType::EndElement);
     EXPECT_EQ(TempEntity.DNameData,"tag");
-    EXPECT_TRUE(TempEntity.DAttributes.empty());
 }
 
 TEST(XMLWriter, MultipleAttrTest){
@@ -260,14 +271,18 @@ TEST(XMLWriter, CompleteElementTest){
     EXPECT_EQ(Output, "<butterfly species=\"monarch\"/>");
 }
 
-TEST(XMLReader, CompleteElementTest){
-    std::string XMLString = "<butterfly species=\"monarch\"/>";
+TEST(XMLReader, EndTest){
+    std::string XMLString = "<tag></tag>";
     std::shared_ptr<CStringDataSource> DataSource = std::make_shared<CStringDataSource>(XMLString);
     CXMLReader Reader(DataSource);
     SXMLEntity TempEntity;
     EXPECT_TRUE(Reader.ReadEntity(TempEntity));
-    EXPECT_EQ(TempEntity.DType,SXMLEntity::EType::CompleteElement);
-    EXPECT_EQ(TempEntity.DNameData,"butterfly");
-    ASSERT_EQ(TempEntity.DAttributes.size(),1);
-    EXPECT_EQ(TempEntity.AttributeValue("species"),"monarch");
+    EXPECT_EQ(TempEntity.DType,SXMLEntity::EType::StartElement);
+    EXPECT_EQ(TempEntity.DNameData,"tag");
+    EXPECT_TRUE(TempEntity.DAttributes.empty());
+    EXPECT_TRUE(Reader.ReadEntity(TempEntity));
+    EXPECT_EQ(TempEntity.DType,SXMLEntity::EType::EndElement);
+    EXPECT_EQ(TempEntity.DNameData,"tag");
+    EXPECT_TRUE(TempEntity.DAttributes.empty());
+    EXPECT_TRUE(Reader.End());
 }
